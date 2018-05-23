@@ -1,4 +1,4 @@
-# [Super Tiny Colors Library](https://nelbren.github.io/en/terminal/consola/2018/05/13/super-tiny-colors.bash/) [\[en Español\]](https://nelbren.github.io/es/terminal/consola/2018/05/13/super-tiny-colors.bash/)
+# [Super Tiny Colors Library](https://nelbren.github.io/en/terminal/2018/05/13/super-tiny-colors.bash/) [\[en Español\]](https://nelbren.github.io/es/terminal/2018/05/13/super-tiny-colors.bash/)
 
 ## What is it?
 It is an ultra-super small compact and minimalist **library** (*done in 7 code lines*) used for scripts of [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)).
