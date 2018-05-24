@@ -4,6 +4,7 @@
 #
 # v0.0.1 - 2018-04-22 - nelbren@nelbren.com
 # v0.0.2 - 2018-05-23 - nelbren@nelbren.com
+# v0.0.3 - 2018-05-24 - nelbren@nelbren.com
 #
 
 color_msg() {
@@ -98,7 +99,8 @@ raw_get() {
   uptime=$(awk '{printf("%dd%dh%dm%ds\n",($1/60/60/24),($1/60/60%24),($1/60%60),($1%60))}' /proc/uptime)
   uptime=$(echo $uptime | sed "s/^0d//")
   uptime=$(echo $uptime)
-  raw="U$uptime"
+  uptime=$(echo $uptime | cut -d"d" -f1)
+  raw="U${uptime}d"
 
   cmf=/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq
   if [ -r $cmf ]; then
