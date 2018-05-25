@@ -1,10 +1,11 @@
 #!/bin/bash
 #
-# check_si.bash
+# si.bash
 #
 # v0.0.1 - 2018-04-22 - nelbren@nelbren.com
 # v0.0.2 - 2018-05-23 - nelbren@nelbren.com
 # v0.0.3 - 2018-05-24 - nelbren@nelbren.com
+# v0.0.4 - 2018-05-25 - nelbren@nelbren.com
 #
 
 params() {
