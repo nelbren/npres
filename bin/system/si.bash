@@ -7,6 +7,18 @@
 # v0.0.3 - 2018-05-24 - nelbren@nelbren.com
 #
 
+params() {
+  for i in "$@"; do
+    case $i in
+      -invert) INVERT=1; shift;;
+      *) # unknown option
+      ;;
+    esac
+  done
+
+  [ -z "$INVERT" ] && INVERT=0
+}
+
 color_msg() {
   pstate=$1
   msg1=$2
@@ -31,7 +43,11 @@ color_msg() {
     esac
   fi
   if [ "$hight" == "1" ]; then
-    color2=$Ib
+    if [ "$INVERT" == "0" ]; then
+      color2=$nB
+    else
+      color2=$Ib
+    fi
   else
     color2=""
   fi
@@ -156,7 +172,7 @@ raw_get() {
   pcpu=$(cpu_get)
   raw="$raw C$pcpu"
 
-  procs=$(ls -ld /proc/[0-9]* | wc -l)
+  procs=$(ls -ld /proc/[0-9]* 2>/dev/null | wc -l)
   raw="$raw P$procs"
 
   rprocs=$(grep procs_running /proc/stat | cut -d" " -f2)
@@ -355,8 +371,6 @@ raw_check() {
   while read linea; do
     label=${linea:0:1}
     value=${linea:1}
-    #label=$(echo $linea | cut -d":" -f1)
-    #value=$(echo $linea | cut -d":" -f2)
     state=$STATE_OK
     case $label in
       D) check_dt;;
@@ -373,10 +387,8 @@ raw_check() {
     esac
     line="${line} "
   done
-  #raw_system
   time_usage
 }
-
 
 utils=/usr/local/npres/lib/utils.bash
 [ -x $utils ] || exit 1
@@ -391,31 +403,20 @@ shopt -s lastpipe
 
 datehour_when=$(date +'%Y-%m-%d %H:%M:%S')
 
-if [ -n "$1" ]; then
-  host=$1
-else
-  host=$(get_hostname)
-fi
-
 STATE_OK=0
 STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
 STATE_DEPENDENT=4
 STATE_INFO=5
-INVERT=1
 
 bstate=$STATE_OK
 status_type="OK"
 base=/usr/local/npres
 
+params $@
 raw_get
-
-if [ "$2" == "nagios" ]; then
-  echo "$status_type - ${raw}"
-else
-  raw_check
-  echo -e "$line"
-fi
+raw_check
+echo -e "$line"
 
 exit $bstate
