@@ -77,6 +77,7 @@ approximation() {
 }
 
 cpu_get() {
+  # http://colby.id.au/calculating-cpu-usage-from-proc-stat/
   # by Paul Colby (http://colby.id.au), no rights reserved ;)
   PREV_TOTAL=0
   PREV_IDLE=0
@@ -91,7 +92,6 @@ cpu_get() {
 
     # Calculate the total CPU time.
     TOTAL=0
-
     for VALUE in "${CPU[@]:0:4}"; do
       let "TOTAL=$TOTAL+$VALUE"
     done
