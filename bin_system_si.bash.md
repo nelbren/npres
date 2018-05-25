@@ -38,7 +38,7 @@ It is a sequence of commands from bash which extracts the information utilizing 
 
 ## <i class="fa fa-eye" aria-hidden="true"></i> Information shown:
 
-  ![](/img/custom/sib_system-information-bar.png)
+  ![](https://github.com/nelbren/nelbren.github.io/blob/master/img/custom/sib_system-information-bar.png?raw=true)
 
 ## <i class="fa fa-arrow-circle-down" aria-hidden="true"></i> How do i obtain it?
 
@@ -64,11 +64,11 @@ It is a sequence of commands from bash which extracts the information utilizing 
 
 - ### <i class="fa fa-sign-in" aria-hidden="true"></i> When logging in:
   Example of command execution:
-  ![](/img/custom/sib_example_etc_profile.png)
+  ![](https://github.com/nelbren/nelbren.github.io/blob/master/img/custom/sib_example_etc_profile.png?raw=true)
 
 - ### <i class="fa fa-keyboard-o" aria-hidden="true"></i> By demand:
   Example of command execution:
-  ![](/img/custom/sib_example_por_demanda.png)
+  ![](https://github.com/nelbren/nelbren.github.io/blob/master/img/custom/sib_example_por_demanda.png?raw=true)
 
 <hr class="small">
 
