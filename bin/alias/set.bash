@@ -1,4 +1,6 @@
 #!/bin/bash
 
 base=/usr/local/npres
-alias si="$base/bin/system/check_si.bash"
+alias si="$base/bin/system/si.bash"
+
+si
