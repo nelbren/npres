@@ -21,7 +21,10 @@
 
   - #### <i class="fa fa-star" aria-hidden="true"></i> [The Stress Terminal UI: s-tui](https://amanusk.github.io/s-tui/)
 
-    - ##### <i class="fa fa-line-chart" aria-hidden="true"></i> pip install s-tui; apt install strees; while true; do si; done <i class="fa fa-tachometer" aria-hidden="true"></i>
+    - ##### <i class="fa fa-line-chart" aria-hidden="true"></i> pip install s-tui; apt install stress; s-tui
+    ![](https://github.com/nelbren/nelbren.github.io/blob/master/img/custom/stress_s-tui.png)
+    - ##### <i class="fa fa-tachometer" aria-hidden="true"></i> while true; do si; done
+    ![](https://github.com/nelbren/nelbren.github.io/blob/master/img/custom/stress_si.png)
 
 - ### <i class="fa fa-desktop" aria-hidden="true"></i> Web:
 
