@@ -6,18 +6,23 @@
 # v0.0.2 - 2018-05-23 - nelbren@nelbren.com
 # v0.0.3 - 2018-05-24 - nelbren@nelbren.com
 # v0.0.4 - 2018-05-25 - nelbren@nelbren.com
+# v0.0.5 - 2018-06-04 - nelbren@nelbren.com
 #
 
 params() {
   for i in "$@"; do
     case $i in
-      -invert) INVERT=1; shift;;
+      --invert|-i) INVERT=1; shift;;
+      --nagios|-n) NAGIOS=1; shift;;
+      --help|-h) HELP=1; shift;;
       *) # unknown option
       ;;
     esac
   done
 
   [ -z "$INVERT" ] && INVERT=0
+  [ -z "$NAGIOS" ] && NAGIOS=0
+  [ -z "$HELP" ] && HELP=0
 }
 
 color_msg() {
@@ -61,6 +66,14 @@ color_msg() {
   if [ "$pstate" -gt "$bstate" -a "$bstate" != "$STATE_CRITICAL" -a "$pstate" != "$STATE_INFO" ]; then
     bstate=$pstate
   fi
+}
+
+bstate_to_status_type() {
+  case $bstate in
+   $STATE_OK) status_type="OK";;
+   $STATE_WARNING) status_type="WARNING";;
+   $STATE_CRITICAL) status_type="CRITICAL";;
+  esac
 }
 
 regex_get() {
@@ -169,9 +182,10 @@ raw_get() {
   if [ "$pswap" != "-1" ]; then
     raw="$raw S$pswap%"
   fi
-
+  
+  cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
   pcpu=$(cpu_get)
-  raw="$raw C$pcpu"
+  raw="$raw C$cpus=$pcpu"
 
   procs=$(ls -ld /proc/[0-9]* 2>/dev/null | wc -l)
   raw="$raw P$procs"
@@ -228,8 +242,8 @@ check_dt() {
 check_dv() {
   dv=$value
   dv0=$(echo $dv | cut -d"." -f1)
-  [ $dv0 -lt 9 ] && state=$STATE_WARNING
-  [ $dv0 -lt 8 ] && state=$STATE_CRITICAL
+  #[ $dv0 -lt 9 ] && state=$STATE_WARNING
+  #[ $dv0 -lt 8 ] && state=$STATE_CRITICAL
   color_msg $state $label $dv
 }
 
@@ -240,28 +254,31 @@ check_info() {
 check_ram() {
   nvalue=$(echo $value | cut -d"%" -f1)
   color_msg $STATE_INFO ${label} "" 0 1
-  [ $nvalue -gt 50 ] && state=$STATE_WARNING
-  [ $nvalue -gt 75 ] && state=$STATE_CRITICAL
+  [ $nvalue -gt 80 ] && state=$STATE_WARNING
+  [ $nvalue -gt 90 ] && state=$STATE_CRITICAL
   color_msg $state "" $value
+  nag_ram=$nvalue
 }
 
 check_swap() {
   nvalue=$(echo $value | cut -d"%" -f1)
   color_msg $STATE_INFO ${label} "" 0 1
   if [ "$nvalue" != "Noswap" ]; then
-    [ $nvalue -gt 20 ] && state=$STATE_WARNING
-    [ $nvalue -gt 40 ] && state=$STATE_CRITICAL
+    [ $nvalue -gt 60 ] && state=$STATE_WARNING
+    [ $nvalue -gt 80 ] && state=$STATE_CRITICAL
   fi
   color_msg $state "" $value
 }
 
 check_cpu() {
-  cpus=$(cat /proc/cpuinfo | grep processor | wc -l)
-  color_msg $STATE_INFO ${label} ${cpus}= 0 1
-  nvalue=$(echo $value | cut -d"%" -f1)
+  subvalue1=$(echo $value | cut -d"=" -f1)
+  subvalue2=$(echo $value | cut -d"=" -f2)  
+  color_msg $STATE_INFO ${label} ${subvalue1}= 0 1
+  nvalue=$(echo $subvalue2 | cut -d"%" -f1)
   [ $nvalue -gt 50 ] && state=$STATE_WARNING
   [ $nvalue -gt 75 ] && state=$STATE_CRITICAL
-  color_msg $state "" $value
+  color_msg $state "" $subvalue2
+  nag_cpu=$nvalue
 }
 
 check_procs() {
@@ -269,8 +286,6 @@ check_procs() {
   subvalue2=$(echo $value | cut -d"/" -f2)
   subsubvalue1=${subvalue2:0:1}
   subsubvalue2=${subvalue2:1}
-  #subsubvalue1=$(echo $subvalue2 | cut -d"=" -f1)
-  #subsubvalue2=$(echo $subvalue2 | cut -d"=" -f2)
   color_msg $STATE_INFO ${label} "" 0 1
   [ $subvalue1 -gt 250 ] && state=$STATE_WARNING
   [ $subvalue1 -gt 300 ] && state=$STATE_CRITICAL
@@ -279,7 +294,6 @@ check_procs() {
   state=$STATE_OK
   [ $subsubvalue2 -gt 5 ] && state=$STATE_WARNING
   [ $subsubvalue2 -gt 10 ] && state=$STATE_CRITICAL
-  #state=$STATE_CRITICAL #4TEST
   color_msg $state "" $subsubvalue2 
 }
 
@@ -289,9 +303,9 @@ check_fs() {
   nsubvalue=$(echo $subvalue2 | cut -d"%" -f1 | cut -d"." -f1)
   color_msg $STATE_INFO ${label} ${subvalue1}= 0 1
   [ $nsubvalue -gt 80 ] && state=$STATE_WARNING
-  [ $nsubvalue -gt 90 ] && state=$STATE_CRITICAL
-  #state=$STATE_UNKNOWN #4test
+  [ $nsubvalue -gt 95 ] && state=$STATE_CRITICAL
   color_msg $state "" $subvalue2
+  nag_fs=$nsubvalue
 }
 
 convert_to_bytes() {
@@ -308,7 +322,6 @@ convert_to_bytes() {
     MiB) bytes=$(echo -e "$numbers*$mult*$mult\n" | bc);;
     GiB) bytes=$(echo -e "$numbers*$mult*$mult*$mult\n" | bc);;
   esac
-  #echo "human = $human numbers = $numbers measure = $measure --> $bytes"
   echo $bytes
 }
 
@@ -318,10 +331,6 @@ check_net() {
   subvalue2=$(echo $value | cut -d"/" -f2)
   subsubvalue1=${subvalue1:1}
   subsubvalue2=${subvalue2:1}
-  #subsubvalue1=$(echo $subvalue1 | cut -d"=" -f2)
-  #subsubvalue2=$(echo $subvalue2 | cut -d"=" -f2)
-  #echo "(${subvalue1}|${subvalue2})"
-  #echo "(${subsubvalue1}|${subsubvalue2})"
   ethtool=/sbin/ethtool
   speed=""
   if [ -x /sbin/iw ]; then
@@ -366,8 +375,20 @@ time_usage() {
   color_msg $STATE_INFO T "$diff_human"
 }
 
+nagios_line() {
+  [ "$NAGIOS" == "0" ] && return
+  if [ "$state" != "$STATE_OK" ]; then
+    sep2='*'
+  else
+    sep2=''
+  fi  
+  nagios="$nagios$sep1$sep2$label$value$sep2"
+  [ -z "$sep1" ] && sep1=" "
+}
+
 raw_check() {
-  # D20180523205025 U18h37m34s M2295 R11% C4=1% P97/R1 F/38% NU0B/D0B=0% V9.4 E12345 T1s
+  nagios=""
+  sep1=""
   echo $raw | tr "[ ]" "[\n]" | \
   while read linea; do
     label=${linea:0:1}
@@ -386,9 +407,11 @@ raw_check() {
       *) echo $label
          echo -e "\t$value";;
     esac
+    nagios_line
     line="${line} "
   done
   time_usage
+  bstate_to_status_type
 }
 
 utils=/usr/local/npres/lib/utils.bash
@@ -402,6 +425,7 @@ stc=/usr/local/npres/lib/super-tiny-colors.bash
 set +m
 shopt -s lastpipe
 
+myself=$(basename $0)
 datehour_when=$(date +'%Y-%m-%d %H:%M:%S')
 
 STATE_OK=0
@@ -412,12 +436,22 @@ STATE_DEPENDENT=4
 STATE_INFO=5
 
 bstate=$STATE_OK
-status_type="OK"
 base=/usr/local/npres
 
 params $@
+
+if [ "$HELP" == "1" ]; then
+  echo "Uso: $myself [--invert|-i] [--help|-h]"
+  exit 0
+fi
+
 raw_get
 raw_check
-echo -e "$line"
+
+if [ "$NAGIOS" == "1" ]; then
+  echo "$status_type - $nagios | ram=$nag_ram cpu=$nag_cpu fs=$nag_fs"
+else
+  echo -e "$line"
+fi
 
 exit $bstate
