@@ -302,7 +302,7 @@ check_fs() {
   subvalue2=$(echo $value | cut -d"=" -f2)
   nsubvalue=$(echo $subvalue2 | cut -d"%" -f1 | cut -d"." -f1)
   color_msg $STATE_INFO ${label} ${subvalue1}= 0 1
-  [ $nsubvalue -gt 80 ] && state=$STATE_WARNING
+  [ $nsubvalue -gt 90 ] && state=$STATE_WARNING
   [ $nsubvalue -gt 95 ] && state=$STATE_CRITICAL
   color_msg $state "" $subvalue2
   nag_fs=$nsubvalue
