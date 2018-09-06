@@ -7,6 +7,7 @@
 # v0.0.3 - 2018-05-24 - nelbren@nelbren.com
 # v0.0.4 - 2018-05-25 - nelbren@nelbren.com
 # v0.0.5 - 2018-06-04 - nelbren@nelbren.com
+# v0.0.6 - 2018-09-06 - nelbren@nelbren.com
 #
 
 params() {
@@ -414,6 +415,13 @@ raw_check() {
   bstate_to_status_type
 }
 
+pkg_check() {
+  if [ ! -x /usr/bin/bc ]; then
+    echo -e "${iy}Please install bc$S\n${cOK}apt -y install bc$S"
+    exit 1
+  fi
+}
+
 utils=/usr/local/npres/lib/utils.bash
 [ -x $utils ] || exit 1
 . $utils
@@ -445,6 +453,7 @@ if [ "$HELP" == "1" ]; then
   exit 0
 fi
 
+pkg_check
 raw_get
 raw_check
 
