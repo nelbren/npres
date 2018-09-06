@@ -7,11 +7,8 @@
 # v0.0.3 - 2018-05-24 - nelbren@nelbren.com
 # v0.0.4 - 2018-05-25 - nelbren@nelbren.com
 # v0.0.5 - 2018-06-04 - nelbren@nelbren.com
-<<<<<<< HEAD
-# v0.0.6 - 2018-09-06 - nelbren@nelbren.com
-=======
 # v0.0.6 - 2018-07-18 - nelbren@nelbren.com
->>>>>>> 511960c72fb0fde7f7e4e9ee35a98ddd281bc87b
+# v0.0.7 - 2018-09-06 - nelbren@nelbren.com
 #
 
 params() {
