@@ -9,7 +9,23 @@
 # v0.0.5 - 2018-06-04 - nelbren@nelbren.com
 # v0.0.6 - 2018-07-18 - nelbren@nelbren.com
 # v0.0.7 - 2018-09-06 - nelbren@nelbren.com
+# v0.0.8 - 2018-10-15 - nelbren@nelbren.com
 #
+
+use() {
+  echo "Usage: "
+  echo "       $myself [OPTION]"
+  echo ""
+  echo "Extracts the information from the system or the files of the process, "
+  echo "according to the thresholds it assigns the color, and shows everything"
+  echo " in a single line in less than 80 characters. More info at nelbren.com"
+  echo ""
+  echo -e "Where: "
+  echo -e "       -i|--invert\tShow info in invert colors."
+  echo -e "       -n|--nagios\tShow info in plain text and stats for nagios"
+  echo -e "       -h|--help\tShow this information."
+  exit 0
+}
 
 params() {
   for i in "$@"; do
@@ -449,10 +465,7 @@ base=/usr/local/npres
 
 params $@
 
-if [ "$HELP" == "1" ]; then
-  echo "Uso: $myself [--invert|-i] [--help|-h]"
-  exit 0
-fi
+[ "$HELP" == "1" ] && use
 
 pkg_check
 raw_get
