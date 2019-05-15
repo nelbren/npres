@@ -10,7 +10,8 @@
 # v0.0.6 - 2018-07-18 - nelbren@nelbren.com
 # v0.0.7 - 2018-09-06 - nelbren@nelbren.com
 # v0.0.8 - 2018-10-15 - nelbren@nelbren.com
-# v0.0.9 - 2019-05-15 - nelbren@nelbren.com - replace bc -> perl
+# v0.0.9 - 2019-04-02 - nelbren@nelbren.com
+# v0.1.0 - 2019-05-15 - nelbren@nelbren.com - replace bc -> perl
 #
 
 use() {
@@ -150,9 +151,9 @@ raw_get() {
   uptime=$(echo $uptime | sed "s/^0d//")
   uptime=$(echo $uptime)
   uptime=$(echo $uptime | cut -d"d" -f1)
-  lu=${#uptime}; lu=$((lu-1))
-  raw="U${uptime}"
-  [ "${uptime:$lu:1}" != "s" ] && raw="${raw}d"
+  l=${#uptime}; l=$((l-1)); f="d"
+  [ "${uptime:$l:1}" == "s" ] && f=""
+  raw="U${uptime}${f}"
 
   cmf=/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq
   if [ -r $cmf ]; then
