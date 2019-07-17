@@ -11,7 +11,8 @@
 # v0.0.7 - 2018-09-06 - nelbren@nelbren.com
 # v0.0.8 - 2018-10-15 - nelbren@nelbren.com
 # v0.0.9 - 2019-04-02 - nelbren@nelbren.com
-# v0.1.0 - 2019-07-16 - nelbren@nelbren.com
+# v0.1.0 - 2019-05-15 - nelbren@nelbren.com - replace bc -> perl
+# v0.1.1 - 2019-07-16 - nelbren@nelbren.com - procs 250->350,300->400
 #
 
 use() {
@@ -106,7 +107,8 @@ regex_get() {
 
 approximation() {
   num=$1
-  echo "scale=1;i=$num/1;scale=0;j=$num/1;j +(i-j>=.5)" | bc
+  #echo "scale=1;i=$num/1;scale=0;j=$num/1;j +(i-j>=.5)" | bc
+  printf "%.*f\n" 0 $num
 }
 
 cpu_get() {
@@ -157,7 +159,8 @@ raw_get() {
   cmf=/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq
   if [ -r $cmf ]; then
     hz=$(cat $cmf)
-    mhz=$(echo $hz/1000 | bc)
+    #mhz=$(echo $hz/1000 | bc)
+    mhz=$(echo print $hz/1000 | perl)
   else
     data_in=$(grep -E "^cpu MHz" /proc/cpuinfo | head -1)
     regex="^cpu MHz\s*:\s*([0-9]+.[0-9]+)"
@@ -183,7 +186,8 @@ raw_get() {
     #echo $memused
   fi
 
-  pmem=$(echo -e "scale=2\n($memused/$memtotal)*100" | bc)
+  #pmem=$(echo -e "scale=2\n($memused/$memtotal)*100" | bc)
+  pmem=$(echo print "($memused/$memtotal)*100" | perl)
   pmem=$(approximation $pmem)
 
   raw="$raw R$pmem%"
@@ -198,7 +202,8 @@ raw_get() {
     regex="^Swap:\s*[0-9]+\s*([0-9]+)"
     swapused=$(regex_get "$regex" "$data_in")
 
-    pswap=$(echo -e "scale=2\n($swapused/$swaptotal)*100" | bc)
+    #pswap=$(echo -e "scale=2\n($swapused/$swaptotal)*100" | bc)
+    pswap=$(echo print "($swapused/$swaptotal)*100" | perl)
     pswap=$(approximation $pswap)
   fi
   if [ "$pswap" != "-1" ]; then
@@ -338,11 +343,15 @@ convert_to_bytes() {
   # Mib tested on:
   # http://www.matisse.net/bitcalc/?input_amount=1000&input_units=megabits
   case $measure in
-    Mib) bytes=$(echo -e "($numbers/8)*$mult*$mult\n" | bc);;
+    #Mib) bytes=$(echo -e "($numbers/8)*$mult*$mult\n" | bc);;
+    Mib) bytes=$(echo print "($numbers/8)*$mult*$mult" | perl);;
       B) bytes=$numbers;;
-    KiB) bytes=$(echo -e "$numbers*$mult\n" | bc);;
-    MiB) bytes=$(echo -e "$numbers*$mult*$mult\n" | bc);;
-    GiB) bytes=$(echo -e "$numbers*$mult*$mult*$mult\n" | bc);;
+    #KiB) bytes=$(echo -e "$numbers*$mult\n" | bc);;
+    KiB) bytes=$(echo print "$numbers*$mult" | perl);;
+    #MiB) bytes=$(echo -e "$numbers*$mult*$mult\n" | bc);;
+    MiB) bytes=$(echo print "$numbers*$mult*$mult" | perl);;
+    #GiB) bytes=$(echo -e "$numbers*$mult*$mult*$mult\n" | bc);;
+    GiB) bytes=$(echo print "$numbers*$mult*$mult*$mult" | perl);;
   esac
   echo $bytes
 }
@@ -371,9 +380,12 @@ check_net() {
   bytes_interface=$(convert_to_bytes ${speed}Mib) 
   bytes1=$(convert_to_bytes ${subsubvalue1})
   bytes2=$(convert_to_bytes ${subsubvalue2})
-  bytes_usage=$(echo -e "$bytes1+$bytes2\n" | bc)
-  p=$(echo -e "scale=2\n$bytes_usage/$bytes_interface\n" | bc)
-  p=$(echo -e "$p*100\n" | bc)
+  #bytes_usage=$(echo -e "$bytes1+$bytes2\n" | bc)
+  bytes_usage=$(echo print "$bytes1+$bytes2" | perl)
+  #p=$(echo -e "scale=2\n$bytes_usage/$bytes_interface\n" | bc)
+  p=$(echo print "$bytes_usage/$bytes_interface" | perl)
+  #p=$(echo -e "$p*100\n" | bc)
+  p=$(echo print "$p*100" | perl)
   nvalue=$(echo $p | cut -d"." -f1)
   #echo $bytes_usage $bytes_interface $p $nvalue
   color_msg $STATE_INFO ${label} $value=
@@ -437,8 +449,8 @@ raw_check() {
 }
 
 pkg_check() {
-  if [ ! -x /usr/bin/bc ]; then
-    echo -e "${iy}Please install bc$S\n${cOK}apt -y install bc$S"
+  if [ ! -x /usr/bin/perl ]; then
+    echo -e "${iy}Please install perl$S\n${cOK}apt -y install perl$S"
     exit 1
   fi
 }
