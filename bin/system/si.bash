@@ -13,6 +13,7 @@
 # v0.0.9 - 2019-04-02 - nelbren@nelbren.com
 # v0.1.0 - 2019-05-15 - nelbren@nelbren.com - replace bc -> perl
 # v0.1.1 - 2019-07-16 - nelbren@nelbren.com - procs 250->350,300->400
+# v0.1.2 - 2019-10-27 - nelbren@nelbren.com - *100 -> 100*
 #
 
 use() {
@@ -187,7 +188,7 @@ raw_get() {
   fi
 
   #pmem=$(echo -e "scale=2\n($memused/$memtotal)*100" | bc)
-  pmem=$(echo print "($memused/$memtotal)*100" | perl)
+  pmem=$(echo print "100*($memused/$memtotal)" | perl)
   pmem=$(approximation $pmem)
 
   raw="$raw R$pmem%"
