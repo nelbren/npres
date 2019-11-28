@@ -14,6 +14,7 @@
 # v0.1.0 - 2019-05-15 - nelbren@nelbren.com - replace bc -> perl
 # v0.1.1 - 2019-07-16 - nelbren@nelbren.com - procs 250->350,300->400
 # v0.1.2 - 2019-10-27 - nelbren@nelbren.com - *100 -> 100*
+# v0.1.3 - 2019-11-28 - nelbren@nelbren.com - fix this alien -> ç
 #
 
 use() {
@@ -366,7 +367,7 @@ check_net() {
   ethtool=/sbin/ethtool
   speed=""
   if [ -x /sbin/iw ]; then
-    speed=$(iw dev $interface link | grep bitrate | cut -d":" -f2)ç
+    speed=$(/sbin/iw dev $interface link | grep bitrate | cut -d":" -f2)
     speed=$(echo $speed | cut -d" " -f1)
     speed=$(echo $speed | cut -d"." -f1)
   fi
