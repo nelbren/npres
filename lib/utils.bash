@@ -7,6 +7,7 @@
 # v0.0.3 - 2018-04-09 - nelbren@nelbren.com
 # v0.0.4 - 2018-05-23 - nelbren@nelbren.com
 # v0.0.5 - 2018-05-23 - nelbren@nelbren.com - replace bc -> perl
+# v0.0.6 - 2020-01-29 - nelbren@nelbren.com - fix convert_from_seconds_to
 #
 
 get_hostname() {
@@ -72,7 +73,7 @@ convert_from_seconds_to() {
   seconds=$(echo print "${value}-$days_seconds-$hours_seconds-$minutes_seconds" | perl)
   if [ "$seconds" == "0" ]; then
     seconds_seconds=0
-    output="${seconds}${measure[3]}"
+    output="${value}${measure[3]}"
   else
     if [ -n "$output" ]; then
       output="${output}${seconds}${measure[3]}"

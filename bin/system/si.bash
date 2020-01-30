@@ -15,6 +15,7 @@
 # v0.1.1 - 2019-07-16 - nelbren@nelbren.com - procs 250->350,300->400
 # v0.1.2 - 2019-10-27 - nelbren@nelbren.com - *100 -> 100*
 # v0.1.3 - 2019-11-28 - nelbren@nelbren.com - fix this alien -> ç
+# v0.1.4 - 2020-01-29 - nelbren@nelbren.com - check_net fixes
 #
 
 use() {
@@ -232,7 +233,7 @@ raw_get() {
   interface=$(regex_get "$regex" "$data_in")
 
   prerx=''
-  rounds=2
+  rounds=1
   while [ "$rounds" -ge "0" ]; do
     if [ -z "$prerx" ]; then
       prerx=$rx
@@ -240,9 +241,17 @@ raw_get() {
     fi
 
     data_in=$(grep $interface /proc/net/dev)
+
+#Inter-|   Receive                                                |  Transmit
+# face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+#   eth0: 4726508496 55445305    0 298036    0     0          0         0 13880888204 5307580    0    1    0     0       0          0
+#     1        2        3        4   5       6     7          8         9 10
+
     rx=$(echo $data_in | cut -d" " -f2)
 
     tx=$(echo $data_in | cut -d" " -f10)
+    #echo $data_in
+    #echo $rx $tx
     rounds=$((rounds-1))
   done
 
@@ -346,7 +355,8 @@ convert_to_bytes() {
   # http://www.matisse.net/bitcalc/?input_amount=1000&input_units=megabits
   case $measure in
     #Mib) bytes=$(echo -e "($numbers/8)*$mult*$mult\n" | bc);;
-    Mib) bytes=$(echo print "($numbers/8)*$mult*$mult" | perl);;
+    # https://www.gbmb.org/mbit-to-bytes 
+    Mib) bytes=$(echo print "$numbers*125000" | perl);;
       B) bytes=$numbers;;
     #KiB) bytes=$(echo -e "$numbers*$mult\n" | bc);;
     KiB) bytes=$(echo print "$numbers*$mult" | perl);;
@@ -388,6 +398,7 @@ check_net() {
   p=$(echo print "$bytes_usage/$bytes_interface" | perl)
   #p=$(echo -e "$p*100\n" | bc)
   p=$(echo print "$p*100" | perl)
+  p=$(approximation $p)
   nvalue=$(echo $p | cut -d"." -f1)
   #echo $bytes_usage $bytes_interface $p $nvalue
   color_msg $STATE_INFO ${label} $value=
@@ -457,6 +468,8 @@ pkg_check() {
   fi
 }
 
+datehour_when=$(date +'%Y-%m-%d %H:%M:%S')
+
 utils=/usr/local/npres/lib/utils.bash
 [ -x $utils ] || exit 1
 . $utils
@@ -469,7 +482,6 @@ set +m
 shopt -s lastpipe
 
 myself=$(basename $0)
-datehour_when=$(date +'%Y-%m-%d %H:%M:%S')
 
 STATE_OK=0
 STATE_WARNING=1
