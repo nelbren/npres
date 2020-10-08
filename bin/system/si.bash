@@ -16,6 +16,7 @@
 # v0.1.2 - 2019-10-27 - nelbren@nelbren.com - *100 -> 100*
 # v0.1.3 - 2019-11-28 - nelbren@nelbren.com - fix this alien -> ç
 # v0.1.4 - 2020-01-29 - nelbren@nelbren.com - check_net fixes
+# v0.1.5 - 2020-10-08 - nelbren@nelbren.com - procs 350->450,400->500
 #
 
 use() {
@@ -325,8 +326,8 @@ check_procs() {
   subsubvalue1=${subvalue2:0:1}
   subsubvalue2=${subvalue2:1}
   color_msg $STATE_INFO ${label} "" 0 1
-  [ $subvalue1 -gt 350 ] && state=$STATE_WARNING
-  [ $subvalue1 -gt 400 ] && state=$STATE_CRITICAL
+  [ $subvalue1 -gt 450 ] && state=$STATE_WARNING
+  [ $subvalue1 -gt 500 ] && state=$STATE_CRITICAL
   color_msg $state "" ${subvalue1}
   color_msg $STATE_INFO "" \/${subsubvalue1}=
   state=$STATE_OK
