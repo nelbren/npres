@@ -1,7 +1,9 @@
 #!/bin/bash
+#
 # p3.bash
 #
 # v0.0.1 - 2020-07-14 - nelbren@nelbren.com
+# v0.0.2 - 2020-12-01 - nelbren@nelbren.com - --no-headers
 #
 
 use() {
@@ -139,7 +141,7 @@ sep1=""
 n=0
 declare -a procs
 
-ps aux | sort -nrk 3,3 | head -n 3 | \
+ps aux --no-headers | sort -nrk 3,3 | head -n 3 | \
 while read USER PID CPU MEM VSZ RSS TTY STAT START TIME COMMAND; do
    #echo $CPU $COMMAND $USER
   cpu=$(echo $CPU | cut -d"." -f1)
