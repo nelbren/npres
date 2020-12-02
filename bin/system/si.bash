@@ -17,6 +17,7 @@
 # v0.1.3 - 2019-11-28 - nelbren@nelbren.com - fix this alien -> ç
 # v0.1.4 - 2020-01-29 - nelbren@nelbren.com - check_net fixes
 # v0.1.5 - 2020-10-08 - nelbren@nelbren.com - procs 350->450,400->500
+# v0.1.6 - 2020-12-02 - nelbren@nelbren.com - lxc /proc/stat show global procs_running
 #
 
 use() {
@@ -221,7 +222,8 @@ raw_get() {
   procs=$(ls -ld /proc/[0-9]* 2>/dev/null | wc -l)
   raw="$raw P$procs"
 
-  rprocs=$(grep procs_running /proc/stat | cut -d" " -f2)
+  #rprocs=$(grep procs_running /proc/stat | cut -d" " -f2)
+  rprocs=$(cat /proc/[0-9]*/status 2>/dev/null | grep running | wc -l)
   raw="$raw/R$rprocs"
 
   data_in=$(df -h / | tail -1)
