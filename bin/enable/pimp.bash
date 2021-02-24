@@ -61,7 +61,7 @@ misc_install_package() {
 
 cowsay_profile_install() {
   file=/etc/profile
-  line="/usr/local/npres/bin/enable/hola.bash"
+  line="source /usr/local/npres/bin/enable/hola.bash"
   inform_task "Exist 'cowsay' in '$file'?"
   if sudo grep -q "$line" $file; then
     inform_and_exit 0 ""
