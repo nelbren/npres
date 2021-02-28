@@ -2,7 +2,7 @@
 #
 # pimp.bash
 #
-# v0.0.1 - 2021-02-24 - nelbren@nelbren.com
+# v0.0.2 - 2021-02-27 - nelbren@nelbren.com
 #
 
 inform_task() {
@@ -53,7 +53,7 @@ apt_install_package() {
 }
 
 misc_install_package() {
-  packages="cowsay fortunes-es fortunes-es-off fortunes-debian-hints lolcat cmatrix"
+  packages="cowsay fortunes-es fortunes-es-off fortunes-debian-hints lolcat cmatrix neofetch"
   for package in $packages; do
     apt_install_package $package
   done
