@@ -2,7 +2,7 @@
 #
 # enable_sudo.bash
 #
-# v0.0.1 - 2021-02-23 - nelbren@nelbren.com
+# v0.0.2 - 2021-03-16 - nelbren@nelbren.com
 #
 
 inform_task() {
@@ -51,7 +51,8 @@ sudo_disable_password() {
 }
 
 sudo_add_to_sudo_group() {
-  user=$(who am i | cut -d" " -f1)
+  #user=$(who am i | cut -d" " -f1)
+  user=$(w -h | grep -v root | cut -d" " -f1 | uniq)
   inform_task "It is the turn to add the '$user' to the 'sudo' group"
   if groups $user | grep -q sudo ; then
     inform_and_exit 0 ""
@@ -69,7 +70,8 @@ sudo_add_to_sudo_group() {
 }
 
 sudo_test_access_to_user() {
-  user=$(who am i | cut -d" " -f1)
+  #user=$(who am i | cut -d" " -f1)
+  user=$(w -h | grep -v root | cut -d" " -f1 | uniq)
   inform_task "Let's test if the '$user' is in the sudo group"
   if su $user -c groups | grep -q sudo ; then
     inform_and_exit 0 ""

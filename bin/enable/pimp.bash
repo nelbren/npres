@@ -2,7 +2,7 @@
 #
 # pimp.bash
 #
-# v0.0.2 - 2021-02-27 - nelbren@nelbren.com
+# v0.0.3 - 2021-03-16 - nelbren@nelbren.com
 #
 
 inform_task() {
@@ -171,6 +171,19 @@ npres_git_clone() {
   fi
 }
 
+locale_fix() {
+  inform_task "Locale fix?"
+  if [ "$LC_ALL" == "$LANG" ]; then
+    inform_and_exit 0 ""
+  else
+    inform_task "NO" 1
+    inform_task "Ok, no problem, i will try fix this" 2
+    sudo update-locale LC_ALL=$LANG
+    sudo locale-gen
+    echo -e "\nNOTE: Please close session and login again to get changes...\n"
+  fi
+}
+
 check_if_normal_user_running
 sudo_test_access_to_user
 misc_install_package
@@ -178,3 +191,4 @@ git_install_package
 npres_git_clone
 cowsay_profile_install
 colors_bashrc_enable
+locale_fix
