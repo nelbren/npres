@@ -18,6 +18,7 @@
 # v0.1.4 - 2020-01-29 - nelbren@nelbren.com - check_net fixes
 # v0.1.5 - 2020-10-08 - nelbren@nelbren.com - procs 350->450,400->500
 # v0.1.6 - 2020-12-02 - nelbren@nelbren.com - lxc /proc/stat show global procs_running
+# v0.1.7 - 2023-04-22 - nelbren@nelbren.com - check_fs 90 -> 95, 95 -> 99
 #
 
 use() {
@@ -343,8 +344,8 @@ check_fs() {
   subvalue2=$(echo $value | cut -d"=" -f2)
   nsubvalue=$(echo $subvalue2 | cut -d"%" -f1 | cut -d"." -f1)
   color_msg $STATE_INFO ${label} ${subvalue1}= 0 1
-  [ $nsubvalue -gt 90 ] && state=$STATE_WARNING
-  [ $nsubvalue -gt 95 ] && state=$STATE_CRITICAL
+  [ $nsubvalue -gt 95 ] && state=$STATE_WARNING
+  [ $nsubvalue -gt 99 ] && state=$STATE_CRITICAL
   color_msg $state "" $subvalue2
   nag_fs=$nsubvalue
 }
