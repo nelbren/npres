@@ -4,6 +4,7 @@
 #
 # v0.0.1 - 2020-07-14 - nelbren@nelbren.com
 # v0.0.2 - 2020-12-01 - nelbren@nelbren.com - --no-headers
+# v0.0.3 - 2024-01-12 - nelbren@nelbren.com - no include the ps
 #
 
 use() {
@@ -141,13 +142,14 @@ sep1=""
 n=0
 declare -a procs
 
-ps aux --no-headers | sort -nrk 3,3 | head -n 3 | \
+ps aux --no-headers | egrep -v "ps aux --no-headers|/usr/local/npres/bin/system/p3.bash" | sort -nrk 3,3 | head -n 3 | \
 while read USER PID CPU MEM VSZ RSS TTY STAT START TIME COMMAND; do
-   #echo $CPU $COMMAND $USER
+  #echo $CPU $COMMAND $USER
   cpu=$(echo $CPU | cut -d"." -f1)
   cpu=$(printf "%03d" "$cpu")
-  cmd=$(echo $COMMAND | cut -d" " -f1)
-  cmd=$(basename $cmd)
+  #cmd=$(echo $COMMAND | cut -d" " -f1)
+  #cmd=$(basename $cmd)
+  cmd="\"$COMMAND\""
   [ -n "$line" ] && line="$line "
 
   state=$STATE_OK
